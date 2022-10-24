@@ -1,48 +1,106 @@
 package com.starmooncloud.overview;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    Chronometer chrono;
+    Button btnStart, btnEnd;
+    RadioButton rdoCal, rdoTime;
+    CalendarView calView;
+    TimePicker tPicker;
+    TextView tvYear, tvMonth, tvDay, tvHour, tvMinute;
+    int selectYear, selectMonth, selectDay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+        setTitle("시간 예약");
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
+        btnStart = (Button) findViewById(R.id.btnStart);
+        btnEnd = (Button) findViewById(R.id.btnEnd);
 
-        LinearLayout baseLayout = new LinearLayout(this);
-        baseLayout.setOrientation(LinearLayout.VERTICAL);
-        baseLayout.setBackgroundColor(Color.rgb(0,255,0));
-        setContentView(baseLayout, params);
+        chrono = (Chronometer) findViewById(R.id.chronometer1);
 
-        setContentView(baseLayout, params);
+        rdoCal = (RadioButton) findViewById(R.id.rdoCal);
+        rdoTime = (RadioButton) findViewById(R.id.rdoTime);
 
-        Button btn = new Button(this);
-        btn.setText("버튼");
-        btn.setBackgroundColor(Color.MAGENTA);
-        baseLayout.addView(btn);
+        tPicker = (TimePicker) findViewById(R.id.timePicker1);
+        calView = (CalendarView) findViewById(R.id.calendarView1);
 
-        btn.setOnClickListener(new View.OnClickListener() {
+        tvYear = (TextView) findViewById(R.id.tvYear);
+        tvMonth = (TextView) findViewById(R.id.tvMonth);
+        tvDay = (TextView) findViewById(R.id.tvDay);
+        tvHour = (TextView) findViewById(R.id.tvHour);
+        tvMinute = (TextView) findViewById(R.id.tvMinute);
+
+        tPicker.setVisibility(View.INVISIBLE);
+        calView.setVisibility(View.INVISIBLE);
+
+
+        rdoCal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "코드로 생성한 버튼입니다",
-                Toast.LENGTH_SHORT).show();
+                tPicker.setVisibility(View.INVISIBLE);
+                calView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        rdoTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tPicker.setVisibility(View.VISIBLE);
+                calView.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chrono.setBase(SystemClock.elapsedRealtime());
+                chrono.start();
+                chrono.setTextColor(Color.RED);
+            }
+        });
+
+        btnEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chrono.stop();
+                chrono.setTextColor(Color.BLUE);
+
+                tvYear.setText(Integer.toString(selectYear));
+                tvMonth.setText(Integer.toString(selectMonth));
+                tvDay.setText(Integer.toString(selectDay));
+                tvHour.setText(Integer.toString(tPicker.getCurrentHour()));
+                tvMinute.setText(Integer.toString(tPicker.getCurrentMinute()));
+            }
+        });
+        calView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
+                selectYear= year;
+                selectMonth = month+1;
+                selectDay = dayOfMonth;
             }
         });
     }
